@@ -134,20 +134,14 @@ abstract class AbstractChecksumMojo
     protected String relativeSubPath = "";
 
     /**
-     * Indicates whether the build will skip execution.
-     *
-     * @since 1.3
-     */
-    @Parameter( defaultValue = "false" )
-    protected boolean skip;
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
+        if (project.getPackaging().equalsIgnoreCase("pom")) return;
+
         // Prepare an execution.
         Execution execution = ( failOnError ) ? new FailOnErrorExecution() : new NeverFailExecution( getLog() );
         execution.setAlgorithms( algorithms );
@@ -189,8 +183,6 @@ abstract class AbstractChecksumMojo
             execution.addTarget( new ShasumSummaryFileTarget(
                 FileUtils.resolveFile( new File( project.getBuild().getDirectory() ), getShasumSummaryFile() ), createArtifactListeners()) );
         }
-
-        if (skip || "pom".equals(project.getPackaging())) return;
 
         // Run the execution.
         try
