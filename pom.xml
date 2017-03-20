@@ -26,9 +26,9 @@
     <version>47</version>
   </parent>
 
-  <groupId>net.nicoulaj.maven.plugins</groupId>
+  <groupId>com.gogoair.build</groupId>
   <artifactId>checksum-maven-plugin</artifactId>
-  <version>1.5</version>
+  <version>1.5.1</version>
   <packaging>maven-plugin</packaging>
 
   <name>checksum-maven-plugin</name>
@@ -49,13 +49,6 @@
     </license>
   </licenses>
 
-  <scm>
-    <url>http://github.com/nicoulaj/checksum-maven-plugin</url>
-    <connection>scm:git:git@github.com:nicoulaj/checksum-maven-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:nicoulaj/checksum-maven-plugin.git</developerConnection>
-    <tag>1.5</tag>
-  </scm>
-
   <issueManagement>
     <system>Github</system>
     <url>http://github.com/nicoulaj/checksum-maven-plugin/issues</url>
@@ -67,10 +60,16 @@
   </ciManagement>
 
   <distributionManagement>
-    <site>
-      <id>github</id>
-      <url>gitsite:git@github.com/nicoulaj/checksum-maven-plugin.git</url>
-    </site>
+    <repository>
+      <id>central</id>
+      <name>ba-vm-afy-01.scm.baengr.gogoair.com-releases</name>
+      <url>http://ba-vm-afy-01.scm.baengr.gogoair.com:8081/artifactory/libs-release-local</url>
+    </repository>
+    <snapshotRepository>
+      <id>snapshots</id>
+      <name>ba-vm-afy-01.scm.baengr.gogoair.com-snapshots</name>
+      <url>http://ba-vm-afy-01.scm.baengr.gogoair.com:8081/artifactory/libs-snapshot-local</url>
+    </snapshotRepository>
   </distributionManagement>
 
   <properties>
