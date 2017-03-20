@@ -190,7 +190,7 @@ abstract class AbstractChecksumMojo
                 FileUtils.resolveFile( new File( project.getBuild().getDirectory() ), getShasumSummaryFile() ), createArtifactListeners()) );
         }
 
-        if (skip) return;
+        if (skip || "pom".equals(project.getPackaging())) return;
 
         // Run the execution.
         try
