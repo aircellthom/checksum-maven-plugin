@@ -1,11 +1,12 @@
-/*
- * Copyright 2010-2016 Julien Nicoulaud <julien.nicoulaud@gmail.com>
+/**
+ * checksum-maven-plugin - http://checksum-maven-plugin.nicoulaj.net
+ * Copyright © 2010-2016 checksum-maven-plugin contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -134,7 +135,25 @@ public class PostBuildScriptHelper
     public void assertFileIsNotEmpty( String path )
         throws Exception
     {
-        File file = new File( baseDirectory, path );
+        assertFileIsNotEmptyRelativeTo( baseDirectory, path );
+    }
+
+    /**
+     * Assert the given file exists and is a non-empty file.
+     *
+     * @param path the path to the file relative to {@link #localRepositoryPath}.
+     * @throws Exception  if conditions are not fulfilled.
+     */
+    public void assertFileIsNotEmptyInLocalRepo( String path )
+        throws Exception
+    {
+        assertFileIsNotEmptyRelativeTo(localRepositoryPath, path);
+    }
+
+	private void assertFileIsNotEmptyRelativeTo( File directory, String path )
+        throws Exception
+    {
+        File file = new File( directory, path );
         if ( !file.isFile() )
         {
             throw new Exception( "The file " + path + " is missing or not a file." );

@@ -1,37 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2010-2016 Julien Nicoulaud <julien.nicoulaud@gmail.com>
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
+
+    checksum-maven-plugin - http://checksum-maven-plugin.nicoulaj.net
+    Copyright © 2010-2016 checksum-maven-plugin contributors
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>net.ju-n</groupId>
-    <artifactId>net-ju-n-parent</artifactId>
-    <version>36</version>
+    <groupId>net.nicoulaj</groupId>
+    <artifactId>parent</artifactId>
+    <version>48</version>
   </parent>
 
-  <groupId>net.ju-n.maven.plugins</groupId>
+  <groupId>net.nicoulaj.maven.plugins</groupId>
   <artifactId>checksum-maven-plugin</artifactId>
-  <version>1.4-SNAPSHOT</version>
+  <version>1.6-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>checksum-maven-plugin</name>
   <description>Compute project artifacts/dependencies/files checksum digests and output them to individual or summary files.
   </description>
-  <url>http://nicoulaj.github.com/checksum-maven-plugin</url>
+  <url>http://checksum-maven-plugin.nicoulaj.net</url>
   <inceptionYear>2010</inceptionYear>
 
   <licenses>
@@ -74,9 +77,11 @@
 
     <!-- Versions -->
     <java.level>1.6</java.level>
-    <maven.target-version>2.2.0</maven.target-version>
-    <bouncycastle.version>1.47</bouncycastle.version>
-    <plexus-utils.version>3.0.2</plexus-utils.version>
+    <maven-model.version>2.2.1</maven-model.version>
+    <maven-project.version>2.2.1</maven-project.version>
+    <maven-min-supported.version>3.0.4</maven-min-supported.version>
+    <bouncycastle.version>1.55</bouncycastle.version>
+    <plexus-utils.version>3.0.24</plexus-utils.version>
 
     <!-- Build settings -->
     <debug>false</debug>
@@ -84,22 +89,26 @@
 
   </properties>
 
+  <prerequisites>
+    <maven>${maven-min-supported.version}</maven>
+  </prerequisites>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.apache.maven</groupId>
-        <artifactId>maven-plugin-api</artifactId>
-        <version>${maven.target-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
         <artifactId>maven-project</artifactId>
-        <version>${maven.target-version}</version>
+        <version>${maven-project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-model</artifactId>
-        <version>${maven.target-version}</version>
+        <version>${maven-model.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-plugin-api</artifactId>
+        <version>${maven-model.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.plugin-tools</groupId>
@@ -152,6 +161,25 @@
 
     <plugins>
       <plugin>
+      <artifactId>maven-enforcer-plugin</artifactId>
+      <executions>
+        <execution>
+          <id>enforce-maven-version</id>
+          <goals>
+            <goal>enforce</goal>
+          </goals>
+          <configuration>
+            <rules>
+              <requireMavenVersion>
+                <version>[${maven-min-supported.version},)</version>
+                <message>Maven v${maven-min-supported.version}+ is required to build this project, please update.</message>
+              </requireMavenVersion>
+            </rules>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
         <executions>
@@ -181,17 +209,13 @@
           </execution>
         </executions>
         <configuration>
-          <extraArtifacts>
-            <extraArtifact>org.apache.maven.plugins:maven-assembly-plugin:2.2-beta-5:jar</extraArtifact>
-            <extraArtifact>junit:junit:4.12:jar</extraArtifact>
-          </extraArtifacts>
           <localRepositoryPath>${project.build.directory}/it/local-repository</localRepositoryPath>
           <showErrors>${debug}</showErrors>
           <debug>${debug}</debug>
           <settingsFile>${invoker.settings-file}</settingsFile>
           <projectsDirectory>${project.basedir}/src/it/projects</projectsDirectory>
           <pomIncludes>
-            <pomInclude>**/pom.xml</pomInclude>
+            <pomInclude>*/*/*/pom.xml</pomInclude>
           </pomIncludes>
           <cloneProjectsTo>${project.build.directory}/it/projects</cloneProjectsTo>
           <reportsDirectory>${project.build.directory}/it/reports</reportsDirectory>
@@ -227,9 +251,6 @@
         <configuration>
           <source>${java.level}</source>
           <target>${java.level}</target>
-          <optimize>true</optimize>
-          <showWarnings>true</showWarnings>
-          <showDeprecation>true</showDeprecation>
         </configuration>
       </plugin>
       <plugin>
@@ -246,19 +267,37 @@
         </configuration>
       </plugin>
       <plugin>
-        <artifactId>maven-site-plugin</artifactId>
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.maven.doxia</groupId>
-            <artifactId>doxia-module-markdown</artifactId>
-            <version>${doxia-module-markdown.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.kohsuke</groupId>
-            <artifactId>wagon-gitsite</artifactId>
-            <version>${wagon-gitsite.version}</version>
-          </dependency>
-        </dependencies>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>pre-unit-test</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>post-unit-test</id>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>pre-integration-test</id>
+            <goals>
+              <goal>prepare-agent-integration</goal>
+            </goals>
+            <configuration>
+              <propertyName>invoker.mavenOpts</propertyName>
+            </configuration>
+          </execution>
+          <execution>
+            <id>post-integration-test</id>
+            <goals>
+              <goal>report-integration</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
 
@@ -271,20 +310,6 @@
       <id>debug</id>
       <properties>
         <debug>true</debug>
-      </properties>
-    </profile>
-
-    <!-- Do not use a custom settings file for maven-invoker-plugin behind a proxy. See MINVOKER-97. -->
-    <profile>
-      <id>behind-proxy</id>
-      <activation>
-        <property>
-          <name>http.proxySet</name>
-          <value>true</value>
-        </property>
-      </activation>
-      <properties>
-        <invoker.settings-file />
       </properties>
     </profile>
 
@@ -307,17 +332,6 @@
   <reporting>
     <plugins>
       <plugin>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>${maven-site-plugin.version}</version>
-        <configuration>
-          <outputEncoding>${encoding}</outputEncoding>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>${maven-project-info-reports-plugin.version}</version>
-      </plugin>
-      <plugin>
         <artifactId>maven-plugin-plugin</artifactId>
         <version>${maven-plugin-plugin.version}</version>
       </plugin>
@@ -330,18 +344,10 @@
             <tagletArtifact>
               <groupId>org.apache.maven.plugin-tools</groupId>
               <artifactId>maven-plugin-tools-javadoc</artifactId>
-              <version>2.6</version>
+              <version>${maven-plugin-tools-javadoc.version}</version>
             </tagletArtifact>
           </tagletArtifacts>
         </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-jxr-plugin</artifactId>
-        <version>${maven-jxr-plugin.version}</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>${maven-surefire-report-plugin.version}</version>
       </plugin>
       <plugin>
         <artifactId>maven-invoker-plugin</artifactId>
@@ -355,44 +361,6 @@
         <version>${maven-pmd-plugin.version}</version>
         <configuration>
           <targetJdk>${java.level}</targetJdk>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>taglist-maven-plugin</artifactId>
-        <version>${taglist-maven-plugin.version}</version>
-        <configuration>
-          <tagListOptions>
-            <tagClasses>
-              <tagClass>
-                <displayName>TODO tags</displayName>
-                <tags>
-                  <tag>
-                    <matchString>todo</matchString>
-                    <matchType>ignoreCase</matchType>
-                  </tag>
-                </tags>
-              </tagClass>
-              <tagClass>
-                <displayName>FIXME tags</displayName>
-                <tags>
-                  <tag>
-                    <matchString>fixme</matchString>
-                    <matchType>ignoreCase</matchType>
-                  </tag>
-                </tags>
-              </tagClass>
-            </tagClasses>
-          </tagListOptions>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-changelog-plugin</artifactId>
-        <version>${maven-changelog-plugin.version}</version>
-        <configuration>
-          <displayChangeSetDetailUrl>${project.scm.url}/commit/%REV%</displayChangeSetDetailUrl>
-          <displayFileDetailUrl>${project.scm.url}/tree/master/%FILE%</displayFileDetailUrl>
-          <displayFileRevDetailUrl>${project.scm.url}/blob/%REV%/%FILE%</displayFileRevDetailUrl>
         </configuration>
       </plugin>
     </plugins>
